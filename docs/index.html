@@ -18,8 +18,9 @@ a{color:inherit;}
 /* ===== layout shell ===== */
 .app{display:flex;min-height:100vh;}
 .sidebar{
-  width:216px;flex:0 0 216px;background:var(--card);border-right:1px solid var(--border);
+  width:216px;flex:0 0 216px;background:linear-gradient(180deg,var(--card) 0%,#0d1522 100%);border-right:1px solid var(--border);
   padding:20px 0;display:flex;flex-direction:column;gap:2px;position:sticky;top:0;height:100vh;overflow-y:auto;
+  box-shadow:4px 0 18px rgba(0,0,0,.25);
 }
 .sb-brand{display:flex;align-items:center;gap:10px;padding:0 20px 20px;margin-bottom:8px;border-bottom:1px solid var(--border);}
 .sb-brand img{height:28px;width:auto;}
@@ -46,6 +47,7 @@ header{
   border-bottom:1px solid var(--border);
   padding:14px 32px;
   display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;
+  box-shadow:0 4px 16px rgba(0,0,0,.3);position:relative;z-index:5;
 }
 .hd-left{display:flex;align-items:center;gap:16px;}
 .hd-logo{height:44px;width:auto;filter:drop-shadow(0 2px 8px rgba(255,116,23,.3));}
@@ -63,9 +65,10 @@ header{
 
 /* ===== resumo executivo ===== */
 .exec{
-  background:linear-gradient(135deg,rgba(255,116,23,.10),rgba(255,116,23,.02));
+  background:linear-gradient(150deg,rgba(255,116,23,.12),rgba(255,116,23,.02) 60%);
   border:1px solid rgba(255,116,23,.28);border-radius:12px;padding:18px 22px;margin-bottom:22px;
   display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;
+  box-shadow:0 1px 0 rgba(255,255,255,.04) inset, 0 8px 20px rgba(0,0,0,.28);
 }
 .exec-txt b{color:var(--orange);}
 .exec-txt{font-size:.86rem;line-height:1.5;max-width:780px;}
@@ -76,8 +79,9 @@ header{
 
 /* ===== filter bar ===== */
 .filter-bar{
-  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  background:linear-gradient(160deg,var(--card2) 0%,var(--card) 70%);border:1px solid var(--border);border-radius:12px;
   padding:14px 18px;margin-bottom:22px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;
+  box-shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 6px 16px rgba(0,0,0,.25);
 }
 .f-group{display:flex;flex-direction:column;gap:5px;flex:1 1 130px;min-width:110px;}
 .f-group label{font-size:.62rem;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;}
@@ -102,11 +106,20 @@ header{
 /* ===== KPI row ===== */
 .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:10px;margin-bottom:22px;}
 .kpi{
-  background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;
+  background:linear-gradient(160deg,var(--card2) 0%,var(--card) 65%);border:1px solid var(--border);border-radius:12px;padding:14px 16px;
   position:relative;transition:border-color .15s,transform .15s,box-shadow .15s;cursor:default;
+  box-shadow:0 1px 0 rgba(255,255,255,.04) inset, 0 6px 14px rgba(0,0,0,.28);
+  /* z-index:1 dá ao card um nível de empilhamento próprio; no hover ele sobe para 30,
+     garantindo que o card (e o tooltip dentro dele) sempre fiquem por cima dos vizinhos,
+     mesmo com o transform criando um novo contexto de empilhamento. */
+  z-index:1;
 }
-.kpi:hover{border-color:rgba(255,116,23,.4);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.35);}
-.kpi-ic{font-size:1.1rem;margin-bottom:6px;}
+.kpi:hover{border-color:rgba(255,116,23,.45);transform:translateY(-3px);box-shadow:0 1px 0 rgba(255,255,255,.05) inset, 0 14px 30px rgba(0,0,0,.45);z-index:30;}
+.kpi-ic{
+  display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9px;
+  font-size:1rem;margin-bottom:8px;background:linear-gradient(150deg,rgba(255,116,23,.22),rgba(255,116,23,.05));
+  box-shadow:0 2px 6px rgba(0,0,0,.3), 0 1px 0 rgba(255,255,255,.06) inset;
+}
 .kpi-lbl{font-size:.66rem;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
 .kpi-val{font-size:1.22rem;font-weight:700;}
 .kpi-val.g{color:var(--green);}
@@ -115,16 +128,17 @@ header{
 .kpi-val.y{color:var(--yellow);}
 .kpi-ctx{font-size:.68rem;color:var(--sub);margin-top:5px;}
 .kpi-tip{
-  display:none;position:absolute;left:0;top:calc(100% + 6px);z-index:5;background:#0a0f1a;color:var(--text);
+  display:none;position:absolute;left:0;top:calc(100% + 6px);z-index:31;background:#0a0f1a;color:var(--text);
   border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:.68rem;line-height:1.4;
-  width:230px;box-shadow:0 10px 24px rgba(0,0,0,.5);
+  width:230px;box-shadow:0 14px 30px rgba(0,0,0,.55);
 }
 .kpi:hover .kpi-tip{display:block;}
 
 /* ===== pendencias ===== */
 .pend{
-  background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.3);border-radius:12px;
+  background:linear-gradient(150deg,rgba(245,158,11,.10),rgba(245,158,11,.02) 65%);border:1px solid rgba(245,158,11,.3);border-radius:12px;
   padding:16px 20px;margin-bottom:22px;
+  box-shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 8px 20px rgba(0,0,0,.25);
 }
 .pend-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
 .pend-head h3{font-size:.86rem;color:var(--yellow);font-weight:700;}
@@ -157,10 +171,11 @@ header{
 /* ===== op cards ===== */
 .op-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px;margin-bottom:8px;}
 .op-card{
-  background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:18px;
-  transition:border-color .18s,transform .18s,box-shadow .18s;
+  background:linear-gradient(160deg,#182437 0%,var(--card2) 60%);border:1px solid var(--border);border-radius:12px;padding:18px;
+  transition:border-color .18s,transform .18s,box-shadow .18s;position:relative;z-index:1;
+  box-shadow:0 1px 0 rgba(255,255,255,.04) inset, 0 6px 16px rgba(0,0,0,.28);
 }
-.op-card:hover{border-color:rgba(255,116,23,.35);transform:translateY(-3px);box-shadow:0 10px 22px rgba(0,0,0,.35);}
+.op-card:hover{border-color:rgba(255,116,23,.35);transform:translateY(-4px);box-shadow:0 1px 0 rgba(255,255,255,.05) inset, 0 16px 32px rgba(0,0,0,.45);z-index:5;}
 .op-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
 .op-name{font-size:.98rem;font-weight:700;}
 .op-sub{font-size:.72rem;color:var(--sub);margin-top:2px;}
@@ -174,7 +189,7 @@ header{
 .op-link:hover{text-decoration:underline;}
 
 /* ===== table ===== */
-table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;font-size:.82rem;}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;font-size:.82rem;box-shadow:0 6px 16px rgba(0,0,0,.25);}
 thead th{background:var(--card2);color:var(--sub);text-transform:uppercase;font-size:.64rem;letter-spacing:.5px;text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;white-space:nowrap;}
 thead th:hover{color:var(--orange);}
 tbody td{padding:11px 12px;border-bottom:1px solid var(--border);}
@@ -186,9 +201,14 @@ tbody tr:hover{background:rgba(255,255,255,.03);cursor:pointer;}
 
 /* ===== charts ===== */
 .charts-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:8px;}
-.chart-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;}
+.chart-card{
+  background:linear-gradient(165deg,var(--card2) 0%,var(--card) 55%);border:1px solid var(--border);border-radius:12px;padding:18px;
+  box-shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 8px 20px rgba(0,0,0,.28);transition:box-shadow .2s,transform .2s;
+}
+.chart-card:hover{box-shadow:0 1px 0 rgba(255,255,255,.04) inset, 0 14px 30px rgba(0,0,0,.4);transform:translateY(-2px);}
 .chart-card h3{font-size:.78rem;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;font-weight:700;}
 .chart-wrap{position:relative;height:250px;}
+.chart-wrap canvas{filter:drop-shadow(0 6px 12px rgba(0,0,0,.35));}
 .chart-card.full{grid-column:1/-1;}
 
 footer{padding:24px 32px;color:var(--sub);font-size:.72rem;text-align:center;border-top:1px solid var(--border);margin-top:12px;}
@@ -216,9 +236,10 @@ footer{padding:24px 32px;color:var(--sub);font-size:.72rem;text-align:center;bor
 .dr-row span:last-child{font-weight:600;}
 
 .notice{
-  background:rgba(255,116,23,.08);border:1px solid rgba(255,116,23,.28);
+  background:linear-gradient(150deg,rgba(255,116,23,.10),rgba(255,116,23,.02) 65%);border:1px solid rgba(255,116,23,.28);
   border-radius:10px;padding:12px 16px;margin-bottom:22px;font-size:.78rem;color:var(--text);
   display:flex;gap:10px;align-items:flex-start;
+  box-shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 6px 14px rgba(0,0,0,.22);
 }
 .notice b{color:var(--orange);}
 
@@ -605,6 +626,32 @@ function sortList(list){
 }
 
 let charts = {};
+// Gradientes verticais/horizontais para dar profundidade (efeito "3D" sutil) às barras,
+// sem distorcer a leitura dos valores — a altura/posição da barra continua sendo o dado real,
+// só o preenchimento ganha um degradê claro→escuro, como uma superfície com luz vindo de cima.
+function vGrad(colorTop, colorBottom){
+  return (ctx)=>{
+    const {chart} = ctx;
+    const {ctx:c, chartArea} = chart;
+    if(!chartArea) return colorTop;
+    const g = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+    g.addColorStop(0, colorTop);
+    g.addColorStop(1, colorBottom);
+    return g;
+  };
+}
+function hGrad(colorLeft, colorRight){
+  return (ctx)=>{
+    const {chart} = ctx;
+    const {ctx:c, chartArea} = chart;
+    if(!chartArea) return colorLeft;
+    const g = c.createLinearGradient(chartArea.left, 0, chartArea.right, 0);
+    g.addColorStop(0, colorLeft);
+    g.addColorStop(1, colorRight);
+    return g;
+  };
+}
+
 function renderCharts(list){
   if(typeof Chart === 'undefined'){
     console.warn('Chart.js não carregou (CDN indisponível) — gráficos não serão renderizados, mas o restante do painel continua funcional.');
@@ -619,8 +666,8 @@ function renderCharts(list){
   charts.fatResul = new Chart(document.getElementById('chartFatResul'), {
     type:'bar',
     data:{labels, datasets:[
-      {label:'Faturamento', data:list.map(d=>d.faturamento), backgroundColor:'#FF7417', borderRadius:4},
-      {label:'Resultado', data:list.map(d=>d.resultado), backgroundColor:'#3B82F6', borderRadius:4},
+      {label:'Faturamento', data:list.map(d=>d.faturamento), backgroundColor:vGrad('#FF9E5C','#FF7417'), hoverBackgroundColor:vGrad('#FFB37D','#FF8A3D'), borderRadius:6, borderSkipped:false},
+      {label:'Resultado', data:list.map(d=>d.resultado), backgroundColor:vGrad('#6EA8FF','#3B82F6'), hoverBackgroundColor:vGrad('#8CBBFF','#548CFF'), borderRadius:6, borderSkipped:false},
     ]},
     options:{...cfgCommon, plugins:{legend:{display:true, labels:{boxWidth:10,font:{size:10}}}}}
   });
@@ -630,14 +677,14 @@ function renderCharts(list){
   if(charts.motorista) charts.motorista.destroy();
   charts.motorista = new Chart(document.getElementById('chartMotorista'), {
     type:'bar',
-    data:{labels:Object.keys(porMotorista), datasets:[{label:'Resultado (R$)', data:Object.values(porMotorista), backgroundColor:'#22C55E', borderRadius:4}]},
+    data:{labels:Object.keys(porMotorista), datasets:[{label:'Resultado (R$)', data:Object.values(porMotorista), backgroundColor:hGrad('#4ADE80','#16A34A'), hoverBackgroundColor:hGrad('#6EE7A0','#22C55E'), borderRadius:6, borderSkipped:false}]},
     options:{...cfgCommon, indexAxis:'y', plugins:{legend:{display:false}}}
   });
 
   if(charts.custoKm) charts.custoKm.destroy();
   charts.custoKm = new Chart(document.getElementById('chartCustoKm'), {
     type:'bar',
-    data:{labels, datasets:[{label:'Custo estimado / KM', data:list.map(d=> d.km>0 ? (d.faturamento-d.resultado)/d.km : 0), backgroundColor:'#EF4444', borderRadius:4}]},
+    data:{labels, datasets:[{label:'Custo estimado / KM', data:list.map(d=> d.km>0 ? (d.faturamento-d.resultado)/d.km : 0), backgroundColor:vGrad('#F98080','#EF4444'), hoverBackgroundColor:vGrad('#FFA0A0','#F65B5B'), borderRadius:6, borderSkipped:false}]},
     options:{...cfgCommon, plugins:{legend:{display:false}}}
   });
 
@@ -648,16 +695,22 @@ function renderCharts(list){
     type:'doughnut',
     data:{labels:Object.keys(statusCounts).map(s=>STATUS_META[s].label), datasets:[{
       data:Object.values(statusCounts),
-      backgroundColor:Object.keys(statusCounts).map(s=>({faturado:'#22C55E',pendente:'#F59E0B',erro:'#EF4444',processando:'#3B82F6',cancelado:'#cbd5e1'}[s]))
+      backgroundColor:Object.keys(statusCounts).map(s=>({faturado:'#22C55E',pendente:'#F59E0B',erro:'#EF4444',processando:'#3B82F6',cancelado:'#cbd5e1'}[s])),
+      borderColor:'#0f1623', borderWidth:3, hoverOffset:10,
     }]},
-    options:{...cfgCommon, plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:10}}}}}
+    options:{...cfgCommon, cutout:'62%', plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:10}}}}}
   });
 
   if(charts.evolucao) charts.evolucao.destroy();
   const totalFat = list.reduce((s,d)=>s+d.faturamento,0);
   charts.evolucao = new Chart(document.getElementById('chartEvolucao'), {
     type:'line',
-    data:{labels:['11/09/2026'], datasets:[{label:'Faturamento (R$)', data:[totalFat], borderColor:'#FF7417', backgroundColor:'rgba(255,116,23,.15)', fill:true, tension:.3, pointRadius:5}]},
+    data:{labels:['11/09/2026'], datasets:[{
+      label:'Faturamento (R$)', data:[totalFat], borderColor:'#FF9E5C', borderWidth:3,
+      backgroundColor:vGrad('rgba(255,158,92,.38)','rgba(255,116,23,0)'), fill:true, tension:.3,
+      pointRadius:6, pointBackgroundColor:'#FF7417', pointBorderColor:'#0c0f14', pointBorderWidth:2,
+      pointHoverRadius:8,
+    }]},
     options:{...cfgCommon, plugins:{legend:{display:false}}}
   });
 }
