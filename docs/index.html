@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de Frota — 11/09/2026 | PortoEx</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#080e18;--card:#0f1623;--card2:#141d2e;--border:#1e2a3a;
+  --text:#dce5f0;--sub:#6b7a91;
+  --green:#22c55e;--red:#ef4444;--yellow:#f59e0b;
+  --blue:#3b82f6;--purple:#a78bfa;--orange:#F47523;--teal:#06b6d4;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
+
+header{
+  background:linear-gradient(135deg,#0c1525 0%,#111d30 100%);
+  border-bottom:1px solid var(--border);
+  padding:14px 32px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;
+}
+.hd-left{display:flex;align-items:center;gap:16px;}
+.hd-mark{
+  width:44px;height:44px;border-radius:10px;
+  background:linear-gradient(135deg,var(--orange),#ff9147);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:1.1rem;color:#10131a;
+  box-shadow:0 2px 10px rgba(244,117,35,.35);
+}
+.hd-title-block{border-left:2px solid var(--orange);padding-left:14px;}
+.hd-title{font-size:1.1rem;font-weight:700;color:var(--text);letter-spacing:.3px;}
+.hd-subtitle{font-size:.72rem;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
+.hd-right{text-align:right;}
+.hd-date-lbl{font-size:.68rem;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;}
+.hd-date-val{font-size:.9rem;font-weight:600;color:var(--text);margin-top:1px;}
+
+.tabs{background:var(--card);border-bottom:1px solid var(--border);padding:0 32px;display:flex;gap:2px;overflow-x:auto;}
+.tab{padding:13px 22px;cursor:default;font-size:.85rem;font-weight:500;color:var(--sub);
+     border-bottom:2px solid transparent;white-space:nowrap;}
+.tab.active{color:var(--orange);border-bottom-color:var(--orange);}
+
+.content{padding:24px 32px;max-width:1440px;margin:0 auto;}
+
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:22px;}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.kpi-ic{font-size:1.1rem;margin-bottom:6px;}
+.kpi-lbl{font-size:.66rem;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.kpi-val{font-size:1.25rem;font-weight:700;}
+.kpi-val.g{color:var(--green);}
+.kpi-val.o{color:var(--orange);}
+.kpi-val.b{color:var(--blue);}
+
+.notice{
+  background:rgba(244,117,35,.08);border:1px solid rgba(244,117,35,.28);
+  border-radius:10px;padding:12px 16px;margin-bottom:22px;font-size:.8rem;color:var(--text);
+  display:flex;gap:10px;align-items:flex-start;
+}
+.notice b{color:var(--orange);}
+
+.section-title{font-size:.78rem;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.6px;margin:26px 0 12px;}
+
+.op-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:18px;}
+.op-card{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:18px;transition:border-color .2s;}
+.op-card:hover{border-color:rgba(244,117,35,.3);}
+.op-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.op-name{font-size:.98rem;font-weight:700;}
+.op-sub{font-size:.72rem;color:var(--sub);margin-top:2px;}
+.badge{font-size:.64rem;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;}
+.badge-g{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.28);}
+.badge-y{background:rgba(245,158,11,.12);color:var(--yellow);border:1px solid rgba(245,158,11,.28);}
+.op-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;margin-top:12px;}
+.op-stat-lbl{font-size:.64rem;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;}
+.op-stat-val{font-size:.92rem;font-weight:700;margin-top:1px;}
+
+.charts-row{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-bottom:8px;}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;}
+.chart-card h3{font-size:.78rem;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;font-weight:700;}
+.chart-wrap{position:relative;height:260px;}
+
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;font-size:.82rem;}
+thead th{background:var(--card2);color:var(--sub);text-transform:uppercase;font-size:.64rem;letter-spacing:.5px;text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);}
+tbody td{padding:11px 12px;border-bottom:1px solid var(--border);}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:rgba(255,255,255,.02);}
+.num-g{color:var(--green);font-weight:700;}
+.num-sub{color:var(--sub);}
+.table-wrap{overflow-x:auto;border-radius:12px;}
+
+footer{padding:24px 32px;color:var(--sub);font-size:.72rem;text-align:center;border-top:1px solid var(--border);margin-top:20px;}
+
+@media (max-width:800px){
+  .charts-row{grid-template-columns:1fr;}
+  header{padding:14px 18px;}
+  .content{padding:18px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hd-left">
+    <div class="hd-mark">PX</div>
+    <div class="hd-title-block">
+      <div class="hd-title">PortoEx — Análise de Frota</div>
+      <div class="hd-subtitle">Sistema AZ · Unidade Matriz · Tipo Próprio</div>
+    </div>
+  </div>
+  <div class="hd-right">
+    <div class="hd-date-lbl">Operação de</div>
+    <div class="hd-date-val">11/09/2026 (sexta-feira)</div>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active">Consolidado — AZ / Matriz</div>
+</div>
+
+<div class="content">
+
+  <div class="notice">
+    <span>⚠️</span>
+    <div><b>Execução de teste.</b> Este painel reflete a primeira rodada do fluxo 204 → 147 no sistema AZ, para o dia 11/09/2026 (Próprio, Matriz). Dos 7 manifestos localizados, apenas 1 tinha CT-e vinculado até o momento da consulta — os demais aparecem com faturamento pendente. Estrutura será replicada para PEX e PTX após validação.</div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-ic">💰</div><div class="kpi-lbl">Faturamento</div><div class="kpi-val o">R$ 42,69</div></div>
+    <div class="kpi"><div class="kpi-ic">📊</div><div class="kpi-lbl">Resultado</div><div class="kpi-val g">R$ 111,98</div></div>
+    <div class="kpi"><div class="kpi-ic">📈</div><div class="kpi-lbl">Margem</div><div class="kpi-val g">64,1%</div></div>
+    <div class="kpi"><div class="kpi-ic">🚛</div><div class="kpi-lbl">Manifestos</div><div class="kpi-val">7</div></div>
+    <div class="kpi"><div class="kpi-ic">📋</div><div class="kpi-lbl">CT-Es</div><div class="kpi-val">1</div></div>
+    <div class="kpi"><div class="kpi-ic">🛣️</div><div class="kpi-lbl">KM Total</div><div class="kpi-val b">223 km</div></div>
+    <div class="kpi"><div class="kpi-ic">✅</div><div class="kpi-lbl">Faturados</div><div class="kpi-val g">1</div></div>
+    <div class="kpi"><div class="kpi-ic">⏳</div><div class="kpi-lbl">Pendentes</div><div class="kpi-val" style="color:var(--yellow)">6</div></div>
+  </div>
+
+  <div class="section-title">Manifestos do dia</div>
+  <div class="op-grid" id="opGrid"></div>
+
+  <div class="section-title">Gráficos</div>
+  <div class="charts-row">
+    <div class="chart-card">
+      <h3>Faturamento por manifesto (R$)</h3>
+      <div class="chart-wrap"><canvas id="chartFat"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>KM rodado por manifesto</h3>
+      <div class="chart-wrap"><canvas id="chartKm"></canvas></div>
+    </div>
+  </div>
+
+  <div class="section-title">Detalhamento por manifesto</div>
+  <div class="table-wrap">
+    <table id="detailTable">
+      <thead>
+        <tr>
+          <th>Manifesto</th><th>Motorista</th><th>Placa</th><th>KM</th>
+          <th>Faturamento</th><th>Resultado</th><th>Margem</th><th>CT-Es</th><th>Status</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+</div>
+
+<footer>PortoEx · Análise de Frota — dados extraídos do sistema AZ (telas 204 e 147) · gerado em 14/09/2026</footer>
+
+<script>
+const dados = [
+  {manifesto:95265, motorista:"Rafael de Freitas", placa:"QIY-4838", km:20, faturamento:42.69, resultado:111.98, margem:64.1, ctes:1, status:"faturado"},
+  {manifesto:95232, motorista:"Josenir de Souza Cunha", placa:"OKG-5179", km:8, faturamento:0, resultado:0, margem:0, ctes:0, status:"pendente"},
+  {manifesto:95229, motorista:"Silvio da Costa Solano", placa:"EWJ-9881", km:2, faturamento:0, resultado:0, margem:0, ctes:0, status:"pendente"},
+  {manifesto:95221, motorista:"Rafael Vicente", placa:"MLM-9642", km:30, faturamento:0, resultado:0, margem:0, ctes:0, status:"pendente"},
+  {manifesto:95216, motorista:"Jair Batista", placa:"MIY-6C60", km:103, faturamento:0, resultado:0, margem:0, ctes:0, status:"pendente"},
+  {manifesto:95214, motorista:"Matuzalem dos Santos", placa:"NPJ-4E43", km:20, faturamento:0, resultado:0, margem:0, ctes:0, status:"pendente"},
+  {manifesto:95196, motorista:"Jaziel Pereira do Nascimento", placa:"MKQ-2E28", km:40, faturamento:0, resultado:0, margem:0, ctes:0, status:"pendente"},
+];
+
+const fmtBRL = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+
+const grid = document.getElementById('opGrid');
+dados.forEach(d=>{
+  const isFat = d.status === "faturado";
+  grid.innerHTML += `
+    <div class="op-card">
+      <div class="op-top">
+        <div>
+          <div class="op-name">Manifesto ${d.manifesto}</div>
+          <div class="op-sub">${d.motorista} · ${d.placa}</div>
+        </div>
+        <span class="badge ${isFat ? 'badge-g' : 'badge-y'}">${isFat ? '✔ Faturado' : '⏳ Pendente'}</span>
+      </div>
+      <div class="op-stats">
+        <div><div class="op-stat-lbl">Faturamento</div><div class="op-stat-val">${fmtBRL(d.faturamento)}</div></div>
+        <div><div class="op-stat-lbl">Resultado</div><div class="op-stat-val ${isFat?'num-g':''}">${fmtBRL(d.resultado)}</div></div>
+        <div><div class="op-stat-lbl">Margem</div><div class="op-stat-val">${d.margem.toFixed(1)}%</div></div>
+        <div><div class="op-stat-lbl">KM</div><div class="op-stat-val">${d.km} km</div></div>
+      </div>
+    </div>`;
+});
+
+const tbody = document.querySelector('#detailTable tbody');
+dados.forEach(d=>{
+  const isFat = d.status === "faturado";
+  tbody.innerHTML += `
+    <tr>
+      <td>${d.manifesto}</td>
+      <td>${d.motorista}</td>
+      <td>${d.placa}</td>
+      <td>${d.km}</td>
+      <td>${fmtBRL(d.faturamento)}</td>
+      <td class="${isFat?'num-g':'num-sub'}">${fmtBRL(d.resultado)}</td>
+      <td>${d.margem.toFixed(1)}%</td>
+      <td>${d.ctes}</td>
+      <td>${isFat ? '✔ Faturado' : '⏳ Pendente'}</td>
+    </tr>`;
+});
+
+const orange = '#F47523', blue='#3b82f6', border='#1e2a3a', sub='#6b7a91';
+Chart.defaults.color = sub;
+Chart.defaults.borderColor = border;
+
+new Chart(document.getElementById('chartFat'), {
+  type: 'bar',
+  data: {
+    labels: dados.map(d=>d.manifesto),
+    datasets: [{ label:'Faturamento (R$)', data: dados.map(d=>d.faturamento), backgroundColor: orange, borderRadius:4 }]
+  },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} }
+});
+
+new Chart(document.getElementById('chartKm'), {
+  type: 'bar',
+  data: {
+    labels: dados.map(d=>d.manifesto),
+    datasets: [{ label:'KM', data: dados.map(d=>d.km), backgroundColor: blue, borderRadius:4 }]
+  },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} }
+});
+</script>
+
+</body>
+</html>
