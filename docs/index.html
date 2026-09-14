@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Painel Operacional Frota — 11/09/2026 | PortoEx</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{
   --bg:#080E18;--card:#111A2A;--card2:#162236;--border:#24344A;
@@ -425,6 +424,10 @@ footer{padding:24px 32px;color:var(--sub);font-size:.72rem;text-align:center;bor
   <div id="drawerBody"></div>
 </aside>
 
+<!-- Chart.js carrega com "defer": não bloqueia o carregamento da página nem o funcionamento do
+     menu/filtros abaixo, mesmo em conexões lentas ou se o CDN demorar/falhar. -->
+<script defer id="chartjsLib" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
 <script>
 const dados = [
   {manifesto:95265, motorista:"Rafael de Freitas", placa:"QIY-4838", km:20, faturamento:42.69, resultado:111.98, margem:64.1, ctes:1, status:"faturado", origem:null, destino:null},
@@ -809,7 +812,12 @@ function closeDrawer(){
   document.getElementById('drawerOverlay').classList.remove('open');
 }
 
-document.addEventListener('DOMContentLoaded', ()=>{
+// Roda imediatamente (não espera DOMContentLoaded): este <script> já está no fim do <body>,
+// depois de todo o HTML que ele usa, então todo elemento referenciado abaixo já existe no DOM
+// neste ponto. Isso garante que os cliques do menu/filtros funcionem desde o primeiro instante
+// em que a página aparece, sem depender do carregamento do Chart.js (que é "defer" e carrega
+// à parte) nem de o evento DOMContentLoaded já ter disparado.
+(function initApp(){
   populateMotoristaFilter();
   document.getElementById('btnAplicar').addEventListener('click', applyFilters);
   document.getElementById('btnLimpar').addEventListener('click', clearFilters);
@@ -867,7 +875,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
   renderAll();
   showView('dashboard');
-});
+
+  // Chart.js carrega em segundo plano (defer) e pode ainda não estar pronto no momento do
+  // renderAll() acima — quando ele terminar de carregar, desenha os gráficos então.
+  const chartLib = document.getElementById('chartjsLib');
+  chartLib.addEventListener('load', ()=> renderCharts(filtered));
+  chartLib.addEventListener('error', ()=> console.warn('Chart.js não pôde ser carregado do CDN — gráficos indisponíveis, restante do painel funciona normalmente.'));
+})();
 </script>
 
 </body>
