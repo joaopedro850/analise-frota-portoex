@@ -187,6 +187,12 @@ header{
 .op-cte{font-size:.72rem;color:var(--sub);}
 .op-link{font-size:.76rem;color:var(--orange);font-weight:600;cursor:pointer;}
 .op-link:hover{text-decoration:underline;}
+.badge-count{background:rgba(255,255,255,.06);color:var(--sub);border:1px solid var(--border);}
+.op-manifests{display:flex;flex-direction:column;}
+.op-manifest{padding-top:10px;}
+.op-manifest + .op-manifest{margin-top:10px;padding-top:14px;border-top:1px dashed var(--border);}
+.op-manifest-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.86rem;font-weight:700;}
+.op-manifest-head .badge{margin-left:6px;}
 
 /* ===== table ===== */
 table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;font-size:.82rem;box-shadow:0 6px 16px rgba(0,0,0,.25);}
@@ -570,27 +576,44 @@ function renderPendencias(list){
 
 function renderCards(list){
   const grid = document.getElementById('opGrid');
-  grid.innerHTML = list.map(d=>{
-    const meta = STATUS_META[d.status];
+  const byPlaca = groupBy(list, d=>d.placa);
+  if(byPlaca.size===0){ grid.innerHTML = '<p style="color:var(--sub);font-size:.82rem;">Nenhum manifesto no período/filtro selecionado.</p>'; return; }
+  grid.innerHTML = [...byPlaca.entries()].map(([placa, items])=>{
+    const motoristas = [...new Set(items.map(d=>d.motorista))].join(', ');
+    const algumFaturado = items.some(d=>d.status==='faturado');
+    const headMeta = algumFaturado ? STATUS_META.faturado : STATUS_META.pendente;
+    const multi = items.length>1;
     return `
     <div class="op-card">
       <div class="op-top">
         <div>
-          <div class="op-name"><span class="dot ${meta.dot}"></span>Manifesto ${d.manifesto}</div>
-          <div class="op-sub">${d.motorista} · ${d.placa}</div>
+          <div class="op-name"><span class="dot ${headMeta.dot}"></span>${placa}</div>
+          <div class="op-sub">${motoristas}</div>
         </div>
-        <span class="badge ${meta.badge}">${meta.label}</span>
+        ${multi ? `<span class="badge badge-count">${items.length} manifestos</span>` : `<span class="badge ${STATUS_META[items[0].status].badge}">${STATUS_META[items[0].status].label}</span>`}
       </div>
-      <div class="op-route">🗺️ ${d.origem||'—'} → ${d.destino||'—'}</div>
-      <div class="op-stats">
-        <div><div class="op-stat-lbl">Faturamento</div><div class="op-stat-val">${fmtBRL(d.faturamento)}</div></div>
-        <div><div class="op-stat-lbl">Resultado</div><div class="op-stat-val ${d.status==='faturado'?'num-g':''}">${fmtBRL(d.resultado)}</div></div>
-        <div><div class="op-stat-lbl">Margem</div><div class="op-stat-val" style="color:${d.status==='faturado'?'var(--green)':'var(--sub)'}">${d.margem.toFixed(1)}%</div></div>
-        <div><div class="op-stat-lbl">KM</div><div class="op-stat-val">${d.km} km</div></div>
-      </div>
-      <div class="op-foot">
-        <span class="op-cte">${d.ctes>0?'✔':'—'} ${d.ctes} CT-e(s)</span>
-        <span class="op-link" onclick="openDrawer(${d.manifesto})">Ver detalhes →</span>
+      <div class="op-manifests">
+        ${items.map(d=>{
+          const meta = STATUS_META[d.status];
+          return `
+          <div class="op-manifest">
+            <div class="op-manifest-head">
+              <span><span class="dot ${meta.dot}"></span>Manifesto ${d.manifesto}</span>
+              ${multi ? `<span class="badge ${meta.badge}">${meta.label}</span>` : ''}
+            </div>
+            <div class="op-route">🗺️ ${d.origem||'—'} → ${d.destino||'—'}</div>
+            <div class="op-stats">
+              <div><div class="op-stat-lbl">Faturamento</div><div class="op-stat-val">${fmtBRL(d.faturamento)}</div></div>
+              <div><div class="op-stat-lbl">Resultado</div><div class="op-stat-val ${d.status==='faturado'?'num-g':''}">${fmtBRL(d.resultado)}</div></div>
+              <div><div class="op-stat-lbl">Margem</div><div class="op-stat-val" style="color:${d.status==='faturado'?'var(--green)':'var(--sub)'}">${d.margem.toFixed(1)}%</div></div>
+              <div><div class="op-stat-lbl">KM</div><div class="op-stat-val">${d.km} km</div></div>
+            </div>
+            <div class="op-foot">
+              <span class="op-cte">${d.ctes>0?'✔':'—'} ${d.ctes} CT-e(s)</span>
+              <span class="op-link" onclick="openDrawer(${d.manifesto})">Ver detalhes →</span>
+            </div>
+          </div>`;
+        }).join('')}
       </div>
     </div>`;
   }).join('');
